@@ -107,7 +107,7 @@ export default function Home() {
         <div className='w-full flex justify-center items-center m-0 h-full rounded-none'>
           <div className={`bg-secondary p-8 text-primary w-full h-full overflow-y-auto`}>
             <h3 className="font-roboto-bold text-3xl text-center">Cart</h3>
-            <p className="py-4 font-roboto text-center">Below are the items in your cart. Once you're done, click checkout to proceed.</p>
+            <p className="py-4 font-roboto text-center">Below are the items in your cart. Once you&lsquo;re done, click checkout to proceed.</p>
             <div className='flex justify-center items-center p-4 px-0 flex-row flex-wrap w-fullx'>
               <div className="overflow-x-auto w-full">
                 <table className="table table-md table w-full">
