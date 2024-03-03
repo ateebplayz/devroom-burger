@@ -12,11 +12,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const mongo_1 = require("./modules/mongo");
+function generateId() {
+    let id = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    for (let i = 0; i < 2; i++) {
+        id += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    id += '-';
+    for (let i = 0; i < 3; i++) {
+        id += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    }
+    id += '-';
+    for (let i = 0; i < 3; i++) {
+        id += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    }
+    return id;
+}
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
+app.use(express_1.default.json());
 let products = [];
 const fetchProducts = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -46,13 +65,81 @@ app.get('/api/products/get', (req, res) => __awaiter(void 0, void 0, void 0, fun
         res.status(500).json({ error: 'Internal server error' });
     }
 }));
+app.get('/api/orders/get', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.query.token;
+    if (token) {
+        try {
+            const decodedToken = jsonwebtoken_1.default.verify(token, process.env.jwtKey || '');
+            if (decodedToken) {
+                const user = yield mongo_1.collections.admin.findOne({ username: decodedToken.username, password: decodedToken.password });
+                if (user) {
+                    const orders = yield mongo_1.collections.orders.find().toArray();
+                    return res.json({ data: orders, status: 200 });
+                }
+                else {
+                    return res.json({ error: 'Not Authorized', code: 401 });
+                }
+            }
+            else {
+                return res.json({ error: 'Not Found', code: 404 });
+            }
+        }
+        catch (_a) { }
+    }
+    else {
+        return res.json({ error: 'Token not found', code: 404 });
+    }
+}));
+app.post('/api/orders/create', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = req.body;
+    const orderData = data.order;
+    try {
+        if (!orderData) {
+            return res.json({ error: 'No order found', code: 404 });
+        }
+        else {
+            yield mongo_1.collections.orders.insertOne({ id: generateId(), order: orderData, date: Date.now() });
+            return res.json({ data: 'Success', code: 200 });
+        }
+    }
+    catch (_b) {
+        console.log;
+    }
+}));
+app.post('/api/orders/delete', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.query.token;
+    const productId = req.query.productId;
+    try {
+        if (!token || !productId) {
+            return res.json({ error: 'No Product ID / Token found', code: 404 });
+        }
+        else {
+            mongo_1.collections.orders.deleteOne({ id: productId });
+            return res.json({ data: 'Success', code: 200 });
+        }
+    }
+    catch (_c) {
+        console.log;
+    }
+}));
 // Handle GET request to /api/admin/get
 app.get('/api/admin/get', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const username = req.query.username;
+    const password = req.query.password;
     try {
-        // Add logic here to fetch admin data
-        // Example:
-        // const adminData = await Admin.findOne();
-        // res.json(adminData);
+        const user = yield mongo_1.collections.admin.findOne({ username: username, password: password });
+        if (user) {
+            return res.json({
+                token: jsonwebtoken_1.default.sign(user, process.env.jwtKey || ''),
+                code: 200,
+            });
+        }
+        else {
+            return res.json({
+                error: 'No username or password found',
+                code: 404
+            });
+        }
     }
     catch (error) {
         console.error('Error fetching admin data:', error);

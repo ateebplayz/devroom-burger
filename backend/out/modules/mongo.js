@@ -10,5 +10,7 @@ dotenv_1.default.config();
 exports.mongoClient = new mongodb_1.MongoClient(process.env.mongoUri || '');
 exports.mongoDb = exports.mongoClient.db('Big_Belly_Burger');
 exports.collections = {
-    products: exports.mongoDb.collection('Products')
+    products: exports.mongoDb.collection('Products'),
+    orders: exports.mongoDb.collection('Orders'),
+    admin: exports.mongoDb.collection('Admin')
 };
