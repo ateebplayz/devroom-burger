@@ -88,8 +88,8 @@ export default function Home() {
             <h3 className="font-roboto-bold text-3xl text-center">Order a Big Belly Burger!</h3>
             <p className="py-4 font-roboto text-center">Check our amazing menu and order the delicious burger you deserve.</p>
             <div className='flex justify-center items-center p-4 px-0 flex-row flex-wrap'>
-                {products.map((product: ProductType) => (
-                  <div className='flex justify-center items-center lg:items-start p-4 bg-white w-full lg:w-72 mt-4 rounded flex-col lg:mx-2'>
+                {products.map((product: ProductType, index) => (
+                  <div key={index} className='flex justify-center items-center lg:items-start p-4 bg-white w-full lg:w-72 mt-4 rounded flex-col lg:mx-2'>
                     <Image src={product.imageUri} height={256} width={256} alt='Burger' className='m-0 self-center'></Image>
                     <h1 className='text-xl font-roboto-bold text-primary text-center w-full'>{product.title}</h1>
                     <span className='badge rounded py-4 lg:p-3 border-none mt-2 text-white text-center text-start w-full bg-transparent'><span className='bg-primary p-2 rounded-lg'>${product.price}</span></span>
@@ -112,7 +112,7 @@ export default function Home() {
         <div className='w-full flex justify-center items-center m-0 h-full rounded-none'>
           <div className={`bg-secondary p-8 text-primary w-full h-full overflow-y-auto`}>
             <h3 className="font-roboto-bold text-3xl text-center">Cart</h3>
-            <p className="py-4 font-roboto text-center">Below are the items in your cart. Once you're done, click checkout to proceed.</p>
+            <p className="py-4 font-roboto text-center">Below are the items in your cart. Once you&lsquo;re done, click checkout to proceed.</p>
             <div className='flex justify-center items-center p-4 px-0 flex-row flex-wrap w-fullx'>
               <div className="overflow-x-auto w-full">
                 <table className="table table-md table w-full">
@@ -127,7 +127,7 @@ export default function Home() {
                   </thead>
                   <tbody>
                     {cart.map((cartItem, index) => (
-                      <tr>
+                      <tr key={index}>
                         <th><Image width={80} height={80} className='rounded-full border-2 border-primary' src={cartItem.imageUri} alt={cartItem.title}/></th>
                         <td>{cartItem.title}</td>
                         <td>${cartItem.price}</td>
